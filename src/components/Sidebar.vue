@@ -49,7 +49,7 @@ function handleNotificationClick(notification: any) {
 
 <template>
   <div :class="[
-    'max-h-screen bg-white/30 backdrop-blur-lg shadow-xl text-white flex flex-col transition-all duration-300',
+    'fixed h-screen bg-white/30 backdrop-blur-lg shadow-xl text-white flex flex-col transition-all duration-300 z-100',
     isCollapsed ? 'w-16' : 'w-56'
   ]">
     <!-- Logo -->
