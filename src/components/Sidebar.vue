@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useRoute } from 'vue-router';
-import { HomeIcon, BriefcaseIcon, UserIcon, FolderIcon, InboxIcon } from '@heroicons/vue/24/outline';
+import { useRoute, useRouter } from 'vue-router';
+import { useAuthStore } from '../stores/auth';
+import { HomeIcon, BriefcaseIcon, UserIcon, FolderIcon, InboxIcon, ArrowRightOnRectangleIcon } from '@heroicons/vue/24/outline';
+import NotificationCenter from './NotificationCenter.vue';
 
 const route = useRoute();
+const router = useRouter();
+const authStore = useAuthStore();
 const isCollapsed = ref(false);
 
 const navItems = [
@@ -17,11 +21,35 @@ const navItems = [
 function toggleSidebar() {
   isCollapsed.value = !isCollapsed.value;
 }
+
+function handleLogout() {
+  authStore.logout();
+  router.push('/login');
+}
+
+function handleNotificationClick(notification: any) {
+  console.log('Notification clicked:', notification);
+  // Handle navigation based on notification type
+  switch (notification.type) {
+    case 'bid':
+      router.push('/projects');
+      break;
+    case 'message':
+      router.push('/messages');
+      break;
+    case 'project':
+      router.push('/projects');
+      break;
+    case 'payment':
+      router.push('/profile');
+      break;
+  }
+}
 </script>
 
 <template>
   <div :class="[
-    'min-h-screen bg-white/30 backdrop-blur-lg shadow-xl text-white flex flex-col transition-all duration-300',
+    'max-h-screen bg-white/30 backdrop-blur-lg shadow-xl text-white flex flex-col transition-all duration-300',
     isCollapsed ? 'w-16' : 'w-56'
   ]">
     <!-- Logo -->
@@ -47,6 +75,38 @@ function toggleSidebar() {
         <span v-if="!isCollapsed">{{ item.name }}</span>
       </router-link>
     </nav>
+
+    <!-- Notification Center -->
+    <div class="p-4 border-t border-gray-700">
+      <div :class="[
+        'flex items-center justify-center',
+        isCollapsed ? 'justify-center' : 'justify-between'
+      ]">
+        <NotificationCenter
+          v-if="!isCollapsed"
+          @notification-click="handleNotificationClick"
+        />
+        <div v-else class="flex justify-center">
+          <NotificationCenter
+            @notification-click="handleNotificationClick"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Logout Button -->
+    <div class="p-4 border-t border-gray-700">
+      <button
+        @click="handleLogout"
+        :class="[
+          'w-full flex items-center rounded-md cursor-pointer transition-all text-red-300 hover:text-red-100 hover:bg-red-900/20',
+          isCollapsed ? 'justify-center py-3' : 'px-4 py-3 space-x-3'
+        ]"
+      >
+        <ArrowRightOnRectangleIcon class="h-6 w-6" />
+        <span v-if="!isCollapsed">Logout</span>
+      </button>
+    </div>
 
     <!-- Toggle Button -->
     <div class="p-4 border-t border-gray-700">
